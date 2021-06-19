@@ -3,6 +3,7 @@ package com.bgpark.app.acount.domain;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Value;
 
 import java.time.LocalDateTime;
 
@@ -76,6 +77,7 @@ public class Account {
     /**
      * TODO: 왜 여기있지??
      */
+    @Value
     public static class AccountId {
         private Long value;
     }
