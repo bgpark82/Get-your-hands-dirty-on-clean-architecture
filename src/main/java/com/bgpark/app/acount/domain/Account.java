@@ -36,6 +36,7 @@ public class Account {
 
     public boolean withdraw(Money money, AccountId targetAccountId) {
         /**
+         * Business Validation
          * 현재 잔고보다 많은 돈을 인출할 경우
          */
         if(!mayWithdraw(money)) {
@@ -71,8 +72,6 @@ public class Account {
                 money.negate())
                 .isPositiveOrZero();
     }
-
-
 
     /**
      * TODO: 왜 여기있지??
