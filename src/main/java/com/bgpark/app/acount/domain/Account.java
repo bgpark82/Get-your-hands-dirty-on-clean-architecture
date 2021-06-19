@@ -28,6 +28,14 @@ public class Account {
      */
     @Getter private final ActivityWindow activityWindow;
 
+    public static Account withoutId( Money baselineBalance, ActivityWindow activityWindow) {
+        return new Account(null, baselineBalance, activityWindow);
+    }
+
+    public static Account withId(AccountId accountId, Money baselineBalance, ActivityWindow activityWindow) {
+        return new Account(accountId, baselineBalance, activityWindow);
+    }
+
     /**
      * baseline 잔고와 창구에서 발생한 출입금 내역을 더한 해당 계좌의 전체 잔고
      */

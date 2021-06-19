@@ -1,12 +1,19 @@
 package com.bgpark.app.acount.domain;
 
 import com.bgpark.app.acount.domain.Account.AccountId;
+import lombok.Getter;
+import lombok.NonNull;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ActivityWindow {
 
     private List<Activity> activities;
+
+    public ActivityWindow(@NonNull List<Activity> activities) {
+        this.activities = activities;
+    }
 
     /**
      * 창구에서 발생한 입금 내역 - 출금 내역
@@ -23,6 +30,10 @@ public class ActivityWindow {
                 .reduce(Money.ZERO, Money::add);
 
         return Money.add(depositBalance, withdrawalBalance.negate());
+    }
+
+    public List<Activity> getActivities() {
+        return Collections.unmodifiableList(this.activities);
     }
 
     public void addActivity(Activity withdrawal) {
