@@ -4,6 +4,8 @@ import com.bgpark.app.acount.domain.Account.AccountId;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,6 +15,11 @@ public class ActivityWindow {
 
     public ActivityWindow(@NonNull List<Activity> activities) {
         this.activities = activities;
+    }
+
+    public ActivityWindow(@NonNull Activity... activities) {
+        this.activities = new ArrayList<>(Arrays.asList(activities))
+        ;
     }
 
     /**
