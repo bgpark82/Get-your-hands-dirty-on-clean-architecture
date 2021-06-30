@@ -5,6 +5,7 @@ import com.bgpark.app.acount.application.port.out.UpdateAccountStatePort;
 import com.bgpark.app.acount.domain.Account;
 import com.bgpark.app.acount.domain.Activity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static com.bgpark.app.acount.domain.Account.*;
 
+@Component
 @RequiredArgsConstructor
 public class AccountPersistenceAdapter implements LoadAccountPort, UpdateAccountStatePort {
 

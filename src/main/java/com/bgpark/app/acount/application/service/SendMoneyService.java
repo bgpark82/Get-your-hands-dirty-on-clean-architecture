@@ -5,9 +5,15 @@ import com.bgpark.app.acount.application.port.in.SendMoneyUseCase;
 import com.bgpark.app.acount.application.port.out.AccountLock;
 import com.bgpark.app.acount.application.port.out.LoadAccountPort;
 import com.bgpark.app.acount.application.port.out.UpdateAccountStatePort;
+import com.bgpark.app.acount.domain.Account;
+import com.bgpark.app.acount.domain.Account.AccountId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
+@Component
 @RequiredArgsConstructor
 @Transactional
 public class SendMoneyService implements SendMoneyUseCase {
@@ -28,7 +34,41 @@ public class SendMoneyService implements SendMoneyUseCase {
          * 잘모르겠으면 UseCase에서 Validation
          */
         checkThreshold(command);
-        return false;
+
+        LocalDateTime baselineDate = LocalDateTime.now().minusDays(10);
+
+        Account sourceAccount = loadAccountPort.loadAccount(
+                command.getSourceAccountId(),
+                baselineDate);
+
+        Account targetAccount = loadAccountPort.loadAccount(
+                command.getTargetAccountId(),
+                baselineDate);
+
+        AccountId sourceAccountId = sourceAccount.getId()
+                .orElseThrow(() -> new IllegalStateException("expected source account ID not to be empty"));
+        AccountId targetAccountId = targetAccount.getId()
+                .orElseThrow(() -> new IllegalStateException("expected target account ID not to be empty"));
+
+        accountLock.lockAccount(sourceAccountId);
+        if (!sourceAccount.withdraw(command.getMoney(), targetAccountId)) {
+            accountLock.releaseAccount(sourceAccountId);
+            return false;
+        }
+
+        accountLock.lockAccount(targetAccountId);
+        if (!targetAccount.deposit(command.getMoney(), sourceAccountId)) {
+            accountLock.releaseAccount(sourceAccountId);
+            accountLock.releaseAccount(targetAccountId);
+            return false;
+        }
+
+        updateAccountStatePort.updateActivities(sourceAccount);
+        updateAccountStatePort.updateActivities(targetAccount);
+
+        accountLock.releaseAccount(sourceAccountId);
+        accountLock.releaseAccount(targetAccountId);
+        return true;
     }
 
     private void checkThreshold(SendMoneyCommand command) {

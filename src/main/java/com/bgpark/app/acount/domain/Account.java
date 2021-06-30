@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Value;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * TODO: 왜 private 이지??
@@ -16,7 +17,7 @@ public class Account {
     /**
      * TODO: 왜 final이지??
      */
-    @Getter private final AccountId id;
+    private final AccountId id;
 
     /**
      * 현재 창구에서, 첫번째로 출입금내역 발생하기 이전의 잔고
@@ -41,6 +42,10 @@ public class Account {
      */
     public Money calculateBalance() {
         return Money.add(this.baselineBalance, this.activityWindow.calculateBalance(this.id));
+    }
+
+    public Optional<AccountId> getId(){
+        return Optional.ofNullable(this.id);
     }
 
     public boolean withdraw(Money money, AccountId targetAccountId) {
