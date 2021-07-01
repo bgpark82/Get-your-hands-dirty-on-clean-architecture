@@ -1,10 +1,10 @@
 package com.bgpark.app;
 
 
-import com.bgpark.app.acount.application.port.out.LoadAccountPort;
-import com.bgpark.app.acount.domain.Account;
-import com.bgpark.app.acount.domain.Account.AccountId;
-import com.bgpark.app.acount.domain.Money;
+import com.bgpark.app.account.application.port.out.LoadAccountPort;
+import com.bgpark.app.account.domain.Account;
+import com.bgpark.app.account.domain.Account.AccountId;
+import com.bgpark.app.account.domain.Money;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

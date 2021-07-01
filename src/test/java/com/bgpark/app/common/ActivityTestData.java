@@ -1,13 +1,12 @@
 package com.bgpark.app.common;
 
-import com.bgpark.app.acount.domain.Account;
-import com.bgpark.app.acount.domain.Activity;
-import com.bgpark.app.acount.domain.Activity.ActivityId;
-import com.bgpark.app.acount.domain.Money;
+import com.bgpark.app.account.domain.Activity;
+import com.bgpark.app.account.domain.Activity.ActivityId;
+import com.bgpark.app.account.domain.Money;
 
 import java.time.LocalDateTime;
 
-import static com.bgpark.app.acount.domain.Account.*;
+import static com.bgpark.app.account.domain.Account.*;
 
 public class ActivityTestData {
 

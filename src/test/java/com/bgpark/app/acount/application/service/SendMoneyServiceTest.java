@@ -1,12 +1,14 @@
 package com.bgpark.app.acount.application.service;
 
-import com.bgpark.app.acount.application.port.in.SendMoneyCommand;
-import com.bgpark.app.acount.application.port.out.AccountLock;
-import com.bgpark.app.acount.application.port.out.LoadAccountPort;
-import com.bgpark.app.acount.application.port.out.UpdateAccountStatePort;
-import com.bgpark.app.acount.domain.Account;
-import com.bgpark.app.acount.domain.Account.AccountId;
-import com.bgpark.app.acount.domain.Money;
+import com.bgpark.app.account.application.port.in.SendMoneyCommand;
+import com.bgpark.app.account.application.port.out.AccountLock;
+import com.bgpark.app.account.application.port.out.LoadAccountPort;
+import com.bgpark.app.account.application.port.out.UpdateAccountStatePort;
+import com.bgpark.app.account.application.service.MoneyTransferProperties;
+import com.bgpark.app.account.application.service.SendMoneyService;
+import com.bgpark.app.account.domain.Account;
+import com.bgpark.app.account.domain.Account.AccountId;
+import com.bgpark.app.account.domain.Money;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -17,7 +19,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;

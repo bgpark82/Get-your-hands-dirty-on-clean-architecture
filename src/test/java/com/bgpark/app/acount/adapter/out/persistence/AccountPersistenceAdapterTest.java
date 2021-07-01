@@ -1,9 +1,13 @@
 package com.bgpark.app.acount.adapter.out.persistence;
 
-import com.bgpark.app.acount.domain.Account;
-import com.bgpark.app.acount.domain.Account.AccountId;
-import com.bgpark.app.acount.domain.ActivityWindow;
-import com.bgpark.app.acount.domain.Money;
+import com.bgpark.app.account.adapter.out.persistence.AccountMapper;
+import com.bgpark.app.account.adapter.out.persistence.AccountPersistenceAdapter;
+import com.bgpark.app.account.adapter.out.persistence.ActivityJpaEntity;
+import com.bgpark.app.account.adapter.out.persistence.ActivityRepository;
+import com.bgpark.app.account.domain.Account;
+import com.bgpark.app.account.domain.Account.AccountId;
+import com.bgpark.app.account.domain.ActivityWindow;
+import com.bgpark.app.account.domain.Money;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -15,7 +19,6 @@ import java.time.LocalDateTime;
 import static com.bgpark.app.common.AccountTestData.defaultAccount;
 import static com.bgpark.app.common.ActivityTestData.defaultActivity;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Import({AccountPersistenceAdapter.class, AccountMapper.class})

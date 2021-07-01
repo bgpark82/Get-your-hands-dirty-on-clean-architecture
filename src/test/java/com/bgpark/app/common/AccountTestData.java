@@ -1,9 +1,9 @@
 package com.bgpark.app.common;
 
-import com.bgpark.app.acount.domain.Account;
-import com.bgpark.app.acount.domain.Account.AccountId;
-import com.bgpark.app.acount.domain.ActivityWindow;
-import com.bgpark.app.acount.domain.Money;
+import com.bgpark.app.account.domain.Account;
+import com.bgpark.app.account.domain.Account.AccountId;
+import com.bgpark.app.account.domain.ActivityWindow;
+import com.bgpark.app.account.domain.Money;
 
 public class AccountTestData {
 
