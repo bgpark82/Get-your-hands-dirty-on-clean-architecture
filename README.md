@@ -1,8 +1,3 @@
-# Get Your Hands Dirty on Clean Architecture 정리
-
-Get Your Hands Dirty on Clean Architecture 책을 읽고 정리한 내용입니다.
-
----
 서비스와 모델(Dto)의 관계
 
 - 서비스 생성 할 때마다, 인풋, 아웃풋 모델(Dto)를 생성한다
@@ -289,3 +284,256 @@ Hexagonal Architecture
 
     - 포트
         - 유즈케이스에 따라 다른 Mapping을 사용하도록 만들어준다
+
+# 어플리케이션 결합
+
+### 1. Plain Code
+
+- configuration component
+    1. web adapter 인스턴스 생성
+    2. HTTP 요청이 web adapter로 라우트 확인
+    3. use case 인스턴스 생성
+    4. web adapter와 use case 인스턴스 제공
+    5. persistence adapter 인스턴스 생성
+    6. persistence adapter와 use case 인스턴스 제공
+    7. persistence adapter가 데이터베이스에 접근하는지 확인
+- 정리
+    1. 인스턴스 생성
+    2. 의존성 연결
+- 단점
+    1. Boiler Plate 크다
+    2. 모든 클래스가 public이 된다
+        - Service가 직접 Persistence에 접근할 수 있다
+        - package-private하게 막는다
+
+### 2. classpath 스캔
+
+- 정리
+    1. 스프링은 classpath를 모두 뒤져서 @Component가 있는 classs를 찾음
+    2. 해당 class로 instance 생성
+    3. 해당 class들을 bean이라 부르고, bean들을 관리하는 것이 application context
+- 단점
+    1. 스프링 프레임워크에 종속
+    2. 다른 어플리케이션의 어노테이션을 바인딩 할 수도 있다
+        - 어떤 bean이 application context에 로드 되는지 모른다
+
+### 3. 스프링의 자바 설정
+
+- 정리
+    1. bean을 생성하는 configuration 클래스 생성 (@Bean)
+    2. application context에 등록 (@Properties)
+- 장점
+    1. Repository의 경우 스프링이 자동 생성
+        - @EnableJpaRepositories 사용
+        - 해당 어노테이션을 모듈로 옮긴다
+        - main에서 실행하면 테스트 할 때도 해당 어노테이션을 사용하기 때문
+    2. 테스트에서 mock할 때 매우 유용하다
+        - 해당 모듈만 mock 하면 되기 때문
+    3. @Component 어노테이션을 여기저기 뿌리고 다닐 필요 없다
+        - 모든 레이어에서 스프링 프레임워크의 의존성을 없앨 수 있다
+        - 한 곳에서 해당 레이어의 dependency를 관리하여 응집도를 높힐 수 있다
+        - SRP
+- 단점
+    - Configuration 클래스가 해당 레이어 패키지에 없으면 public이 되어야 한다
+    - 패키지를 모듈 바운더리로 사용할 수 있다
+    - 각 패키지에서 필요한 레이어의 configuration 설정 가능
+
+# 아키텍처 바운더리 강화
+
+- 의존성의 방향을 한방향으로 하는 것이 아키텍쳐 바운더리를 강화하는 방법
+    - 레이어 간의 바운더리 구분
+    - 안쪽 레이어로 의존성 방향
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e308bf70-c141-470e-9418-ea9c2dca3ca2/78759EDB-CD3E-4990-BF92-23F8B7696A19.jpeg](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e308bf70-c141-470e-9418-ea9c2dca3ca2/78759EDB-CD3E-4990-BF92-23F8B7696A19.jpeg)
+
+1. Domain 레이어
+    - 도메인 모델
+2. Application 레이어
+    - Input Port
+    - Output Port
+    - Service
+3. Adapter 레이어
+    - Web Adapter
+    - Persistence Adapter
+4. Configuration 레이어
+    - **Adapter** Configuration
+
+### Visibility Modifer
+
+1. public
+2. protected
+3. private
+4. **default** = **package private**
+    - **자바 패키지**가 클래스를 그룹화 하는 응집도 높은 **모듈**로 사용가능
+    - 패키지 내의 클래스끼리 접근 가능하지만, 외부 패키지에서는 접근할 수 없다
+    - 패키지 내의 특정 클래스를 모듈의 엔트리 포인트로 만들기 위해 public 지정 가능
+    - 이는 디펜던시의 방향이 잘못흐르는 것을 막을 수 있다
+    - DI는 reflection을 사용하기 때문에 package private에서도 가능하다
+        - 하지만 classpath scanning에서만 가능하다
+    - 하지만 크기가 커지면 같은 패킺에 많은 클래스가 있어서 혼란스럽다
+        - 서브 패키지를 만들면된다
+        - **하지만 자바에서는 서브 패키지는 pakcage private 멤버가 접근하지 못한다**
+        - 서브 패키지는 다른 패키지 이기 때문
+        - **그래서 서브 패키지의 멤버는 public 해야한다**
+
+```markdown
+acount
+├── adapter
+│   ├── in
+│   │   └── **web**
+│   │       └── SendMoneyController.java
+│   └── out
+│       └── **persistence**
+│           ├── AccountJpaEntity.java
+│           ├── AccountMapper.java
+│           ├── AccountPersistenceAdapter.java
+│           ├── AccountRepository.java
+│           ├── ActivityJpaEntity.java
+│           ├── ActivityRepository.java
+│           └── PersistenceAdapterConfiguration.java
+├── application
+│   ├── port
+│   │   ├── **in**
+│   │   │   ├── GetAccountBalanceQuery.java
+│   │   │   ├── SendMoneyCommand.java
+│   │   │   └── SendMoneyUseCase.java
+│   │   └── **out**
+│   │       ├── AccountLock.java
+│   │       ├── LoadAccountPort.java
+│   │       ├── LocalAccountPort.java
+│   │       └── UpdateAccountStatePort.java
+│   └── service
+│       ├── GetAccountBalanceService.java
+│       ├── MoneyTransferProperties.java
+│       ├── NoOpAccountLock.java
+│       ├── SendMoneyService.java
+│       └── ThresholdExceededException.java
+└── **domain**
+    ├── Account.java
+    ├── Activity.java
+    ├── ActivityWindow.java
+    └── Money.java
+```
+
+- **package-private**
+    - **Persistence Adapter**
+    - **Web Adapter**
+    - **Service**
+    - 외부에서 접근할 일이 없기 때문이다
+    - 외부에서의 접근은 상속받은 인터페이스인 output port에서 이루어진다
+- **public**
+    - **Input Port**
+    - **Output Port**
+        - Web Adapter와 Persistence Adapter가 사용
+    - **Domain**
+        - 다른 레이어에서도 사용
+
+### Post Compiler Check
+
+- public 접근자를 사용하면 컴파일러가 다른 클래스가 사용하도록 한다
+- 이때 아키텍쳐가 잘 설계됨에도 불구하고, 의존성의 방향이 잘못된 방향으로 흐를 수 있다
+- 설계의 의존성 규칙이 잘 지켜지는지 체크하는 방법이 필요
+    - 그것이 post compiler check
+
+Post Compiler Check
+
+- 런타임에 의존성 방향 체크
+- 런타임이므로 CI 시, 자동 테스트가 가능하다
+- ArchUnit
+    - [https://www.archunit.org/](https://www.archunit.org/)
+    - 유닛테크스에서 설계 의존성 방향이 깨졌을 때 오류 발생해줌
+- DSL로 만들어서 현재 아키텍쳐에서 잘 사용하도록 만들 수도 있다
+
+### Build Artifacts
+
+- 모듈별로 빌드가능
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/53319e5a-d63c-4e18-a88d-8fdd47fb4f25/DBBA774A-464A-457B-85BA-41BB45911672.jpeg](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/53319e5a-d63c-4e18-a88d-8fdd47fb4f25/DBBA774A-464A-457B-85BA-41BB45911672.jpeg)
+
+1. 3개
+    - configuration.jar
+    - adapters.jar
+        - **web adapter**
+        - **persistence adapter**
+        - 빌드 툴이 web과 persistence adapter 사이의 의존성을 막지 않는다
+        - 그래서 web adapter와 persistence adapter의 의존성이 흐를 수 있다
+    - application.jar
+        - entity
+        - service
+        - port
+2. 4개
+    - configuration.jar
+    - web adapters.jar
+    - persistence adapters.jar
+    - application.jar
+        - entity
+        - service
+        - port
+3. 5개
+    - configuration.jar
+    - web adapters.jar
+    - persistence adapters.jar
+    - ports.jar
+        - **외부 api** 호출 시 사용
+        - **adapter** 호출 시 사용
+    - application.jar
+        - entity
+        - service
+4. 6개
+    - configuration.jar
+    - web adapters.jar
+    - persistence adapters.jar
+    - api-in.jar
+        - input port
+    - api-out.jar
+        - output port
+    - application.jar
+        - service
+    - domain.jar
+        - 외부에서 도메인을 절대 사용하지 못한다
+
+모듈을 나눌 수록 의존성을 잘 통제할 수 있다
+
+- 모듈 내에서만 변경을 가둘 수 있다
+
+하지만 모듈간 매핑이 더 많아진다  → 더 나은 매핑 전략 선택
+
+- 장점
+    1. 빌드 툴은 순환 의존성을 싫어한다
+        - 순환 의존성에서는 모듈하나를 바꾸면 의존된 다른 모듈 모두에 영향을 미친다
+        - SRP 위반
+        - 하지만 컴파일러는 순환 의존성 신경쓰지도 않는다 그냥 컴파일
+    2. 코드 변화는 모듈 안에서만 일어난다
+        - 만약 테스트 할 때, adapter에서 에러 발생 시, 모듈이 분리 안되있다면 application 레이어 테스트 이전에 adapter의 오류를 고쳐야 한다
+        - 분리한다면 그럴 필요가 없다
+    3. 모듈 간 의존성은 빌드 스크립트에서만 발생
+        - 새로운 의존성 추가는 빌드 스크립트에 추가만하면 된다
+        - 간단해 진다
+        - 빌드 스크립트를 관리하는 의존성만 발생
+
+1. 소프트웨어 아키텍쳐는 의존성 관리가 전부다
+2. 패키지 구조가 중요하다
+    - 의존성이 한쪽으로 흐르도록
+    - pakcage private 사용
+3. 빌드 모듈로 아키텍쳐 바운더리를 강화
+4. 아키텍쳐가 정착되었다 싶으면 아키텍처를 추출해서 빌드 모듈에 넣는다
+    - 디펜던시에 대한 제한적인 통제를 할 수 있다
+
+# 아키텍처 스타일 정하기
+
+1. 언제 hexagonal 아키텍처 사용할 것인가
+2. 언제 전통적인 레이어 아키텍처 사용할 것인가
+
+### 도메인이 왕이다
+
+- hexagonal 아키텍처는 DDD에 좋다
+    - 도메인을 가장 가운데 놓고
+    - 이존성을 도메인으로 향하게 할 수 있다
+
+### 경험은 여왕이다
+
+- 작은 프로젝트 부터 해봐라
+
+### It Depends
+
+- 상황에 알맞은 아키텍처 스타일을 사용한다
