@@ -6,12 +6,10 @@ import com.bgpark.app.acount.domain.Activity;
 import com.bgpark.app.acount.domain.Activity.ActivityId;
 import com.bgpark.app.acount.domain.ActivityWindow;
 import com.bgpark.app.acount.domain.Money;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
 public class AccountMapper {
 
     Account mapToDomainEntity(

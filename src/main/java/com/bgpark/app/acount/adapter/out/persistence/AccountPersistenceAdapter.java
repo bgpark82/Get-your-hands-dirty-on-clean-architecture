@@ -4,7 +4,6 @@ import com.bgpark.app.acount.application.port.out.LoadAccountPort;
 import com.bgpark.app.acount.application.port.out.UpdateAccountStatePort;
 import com.bgpark.app.acount.domain.Account;
 import com.bgpark.app.acount.domain.Activity;
-import com.bgpark.app.common.PersistenceAdapter;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.EntityNotFoundException;
@@ -13,7 +12,6 @@ import java.util.List;
 
 import static com.bgpark.app.acount.domain.Account.AccountId;
 
-@PersistenceAdapter
 @RequiredArgsConstructor
 public class AccountPersistenceAdapter implements LoadAccountPort, UpdateAccountStatePort {
 
